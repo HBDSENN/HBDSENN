@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SENN — 3D Artist</title>
+<link rel="icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- 디자인 시안 2 (x.ai 스타일). data.js·이미지는 index.html·new.html과 공유 -->
+<script src="data.js"></script>
+<style>
+  :root {
+    --bg: #ffffff;
+    --card: #f8f5f3;
+    --card-2: #f2eeeb;
+    --line: #ebe6e2;
+    --chip: #e3ded9;
+    --ink: #0f0f0f;
+    --gray: #6c6764;
+    --gray-2: #9b9692;
+    --teal: #3aa69a;
+    --font: 'Geist', 'Noto Sans KR', system-ui, -apple-system, sans-serif;
+    --r-xl: 28px; --r-lg: 20px; --r-md: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font); -webkit-font-smoothing: antialiased; font-size: 16px; line-height: 1.5; overflow-x: hidden; }
+  a { color: inherit; text-decoration: none; }
+  button, input { font: inherit; color: inherit; }
+  button { background: none; border: 0; cursor: pointer; }
+  img { display: block; max-width: 100%; }
+  :focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 8px; }
+  h1, h2, h3 { font-weight: 500; letter-spacing: -.025em; text-wrap: balance; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding-left: max(20px, env(safe-area-inset-left)); padding-right: max(20px, env(safe-area-inset-right)); }
+
+  /* ---------- 헤더 ---------- */
+  .nav { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,.86); backdrop-filter: saturate(1.6) blur(14px); -webkit-backdrop-filter: saturate(1.6) blur(14px); }
+  .nav .wrap { height: 64px; display: flex; align-items: center; gap: 36px; border-bottom: 1px solid var(--line); }
+  .brand { display: flex; align-items: center; gap: 9px; font-weight: 600; letter-spacing: .02em; }
+  .brand img { width: 26px; height: 26px; }
+  .nav-links { display: flex; gap: 26px; font-size: .9rem; }
+  .nav-links a:hover { color: var(--gray); }
+  .nav-cta { margin-left: auto; display: flex; gap: 8px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 16px; border-radius: 999px; font-size: .9rem; font-weight: 500; transition: background .2s, transform .2s; white-space: nowrap; }
+  .btn-dark { background: var(--ink); color: #fff; }
+  .btn-dark:hover { background: #2a2a2a; }
+  .btn-soft { background: var(--card-2); }
+  .btn-soft:hover { background: #e9e4e0; }
+  .btn-lg { height: 44px; padding: 0 22px; font-size: .95rem; }
+  .btn svg { width: 15px; height: 15px; fill: currentColor; }
+
+  /* ---------- 히어로 ---------- */
+  .hero { text-align: center; padding-block: 72px 56px; }
+  .pill { display: inline-flex; align-items: center; gap: 8px; font-size: .82rem; padding: 6px 8px 6px 14px; border-radius: 999px; background: var(--card); color: var(--ink); }
+  .pill .arrow { width: 22px; height: 22px; border-radius: 50%; background: #fff; display: grid; place-items: center; font-size: .7rem; }
+  .pill:hover { background: var(--card-2); }
+  .hero h1 { font-size: clamp(2.6rem, 6.4vw, 4.4rem); line-height: 1.05; margin: 22px 0 18px; display: flex; align-items: center; justify-content: center; gap: .22em; flex-wrap: wrap; }
+  .hero h1 img { width: .92em; height: .92em; border-radius: 50%; background: var(--card); border: 1px solid var(--line); padding: .14em; }
+  .hero p { color: var(--gray); font-size: 1.12rem; max-width: 34em; margin: 0 auto; }
+  .hero .actions { display: flex; gap: 10px; justify-content: center; margin-top: 28px; flex-wrap: wrap; }
+
+  /* ---------- 앱 창 목업 ---------- */
+  .app { margin: 56px auto 0; max-width: 1000px; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; display: grid; grid-template-columns: 290px 1fr; height: 560px; text-align: left; box-shadow: 0 30px 80px -40px rgba(30,20,10,.25); background: #fff; }
+  .side { background: #fbfaf9; border-right: 1px solid var(--line); display: flex; flex-direction: column; min-width: 0; }
+  .side-top { display: flex; align-items: center; justify-content: space-between; padding: 14px 14px 10px; }
+  .dots { display: flex; gap: 7px; }
+  .dots i { width: 11px; height: 11px; border-radius: 50%; display: block; }
+  .search { margin: 0 12px 8px; height: 32px; border-radius: 9px; background: var(--card-2); display: flex; align-items: center; gap: 8px; padding: 0 10px; font-size: .82rem; color: var(--gray-2); }
+  .search input { border: 0; background: transparent; outline: none; width: 100%; font-size: .82rem; color: var(--ink); }
+  .threads { overflow-y: auto; flex: 1; min-height: 0; padding: 0 8px; }
+  .thread { width: 100%; display: grid; grid-template-columns: 34px 1fr auto; gap: 10px; align-items: center; padding: 9px 8px; border-radius: 10px; text-align: left; }
+  .thread:hover { background: #f3efec; }
+  .thread.on { background: var(--card-2); }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; background: var(--chip); }
+  .thread b { font-weight: 500; font-size: .88rem; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .thread span { font-size: .78rem; color: var(--gray-2); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .thread time { font-size: .72rem; color: var(--gray-2); align-self: start; padding-top: 2px; }
+  .me { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-top: 1px solid var(--line); font-size: .85rem; }
+  .me i { width: 26px; height: 26px; border-radius: 50%; background: var(--card-2); display: grid; place-items: center; font-style: normal; font-size: .66rem; color: var(--gray); }
+  .main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+  .main-head { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--line); font-size: .9rem; font-weight: 500; }
+  .main-head .avatar { width: 22px; height: 22px; }
+  .main-head a { margin-left: auto; font-size: .8rem; color: var(--gray); font-weight: 400; }
+  .main-head a:hover { color: var(--ink); }
+  .convo { flex: 1; min-height: 0; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+  .shot { border-radius: 14px; overflow: hidden; background: var(--card); aspect-ratio: 16 / 9; flex-shrink: 0; cursor: zoom-in; }
+  .shot img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; transition: transform .6s; }
+  .shot.portrait img { object-fit: contain; }
+  .shot:hover img { transform: scale(1.03); }
+  .bubble { align-self: flex-start; max-width: 82%; background: var(--card-2); border-radius: 14px; padding: 9px 13px; font-size: .86rem; }
+  .bubble.mine { align-self: flex-end; background: var(--ink); color: #fff; }
+  .bubble.status { background: transparent; border: 1px solid #cfeee9; color: var(--teal); display: inline-flex; gap: 8px; align-items: center; padding: 5px 12px; border-radius: 999px; font-size: .8rem; }
+  .bubble.status i { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); display: block; animation: blink 1.2s infinite; }
+  @keyframes blink { 50% { opacity: .2; } }
+  .composer { margin: 0 14px 14px; display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 14px; padding: 6px 6px 6px 8px; }
+  .composer .plus { width: 30px; height: 30px; border-radius: 50%; background: var(--card-2); display: grid; place-items: center; color: var(--gray); flex-shrink: 0; }
+  .composer input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font-size: .88rem; }
+  .composer .send { width: 30px; height: 30px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; flex-shrink: 0; }
+  .composer .send svg { width: 14px; height: 14px; fill: currentColor; }
+
+  /* ---------- 큰 카드 섹션 ---------- */
+  section { scroll-margin-top: 80px; }
+  .block { padding-top: 110px; }
+  .feature { background: var(--card); border-radius: var(--r-xl); display: grid; grid-template-columns: 1.05fr 1fr; align-items: center; overflow: hidden; min-height: 460px; }
+  .feature-text { padding: 56px 48px; }
+  .feature-text h2 { font-size: clamp(1.9rem, 3.4vw, 2.7rem); line-height: 1.12; margin-bottom: 16px; }
+  .feature-text p { color: var(--gray); font-size: 1.08rem; max-width: 30em; }
+  .feature-art { position: relative; height: 100%; min-height: 460px; }
+  .feature-art .circle { position: absolute; right: -6%; top: 50%; transform: translateY(-50%); width: min(520px, 110%); aspect-ratio: 1; border-radius: 50%; overflow: hidden; background: var(--ink); box-shadow: 0 30px 60px -30px rgba(0,0,0,.4); }
+  .feature-art .circle img { width: 100%; height: 100%; object-fit: cover; object-position: 78% 30%; }
+
+  .center-head { text-align: center; max-width: 680px; margin: 0 auto 44px; }
+  .center-head h2 { font-size: clamp(1.9rem, 3.6vw, 2.8rem); line-height: 1.12; margin-bottom: 14px; }
+  .center-head p { color: var(--gray); font-size: 1.08rem; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+  .card { background: var(--card); border-radius: var(--r-lg); padding: 30px 30px 0; display: flex; flex-direction: column; overflow: hidden; }
+  .card h3 { font-size: 1.05rem; font-weight: 500; letter-spacing: -.01em; }
+  .card p { color: var(--gray); font-size: .98rem; margin-top: 4px; }
+  .card .frame { margin-top: 26px; border-radius: 14px 14px 0 0; overflow: hidden; background: #fff; border: 1px solid var(--line); border-bottom: 0; aspect-ratio: 16 / 10; }
+  .card .frame-bar { height: 26px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 6px; padding: 0 10px; font-size: .7rem; color: var(--gray-2); }
+  .card .frame-bar i { width: 7px; height: 7px; border-radius: 50%; background: var(--chip); display: block; }
+  .card .frame img { width: 100%; height: calc(100% - 26px); object-fit: cover; object-position: 50% 40%; }
+  .card .tag { margin-left: auto; padding: 1px 8px; border-radius: 999px; background: #fff3e6; color: #c47a2c; font-size: .66rem; }
+
+  /* ---------- 칩으로 프로젝트 고르기 ---------- */
+  .pick { display: grid; grid-template-columns: 1fr 380px; gap: 60px; align-items: center; }
+  .pick h2 { font-size: clamp(1.9rem, 3.6vw, 2.8rem); margin-bottom: 24px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; max-width: 460px; }
+  .chip { display: inline-flex; align-items: center; gap: 7px; height: 34px; padding: 0 13px 0 6px; border: 1px solid var(--chip); border-radius: 999px; font-size: .9rem; transition: background .2s, border-color .2s, color .2s; }
+  .chip img { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; }
+  .chip:hover { background: var(--card); }
+  .chip.on { background: #eaf7f5; border-color: #bfe6e0; color: #1f7f74; }
+  .pick-desc { margin-top: 30px; font-size: 1.05rem; color: var(--gray-2); max-width: 30em; min-height: 3.2em; }
+  .pick-desc b { color: var(--ink); font-weight: 500; }
+  .phone { width: 100%; max-width: 340px; margin: 0 auto; aspect-ratio: 9 / 18.5; border: 3px solid #1d1d1d; border-radius: 46px; padding: 12px; background: #fff; position: relative; box-shadow: 0 30px 60px -36px rgba(0,0,0,.35); }
+  .phone::before { content: ""; position: absolute; top: 14px; left: 50%; transform: translateX(-50%); width: 90px; height: 24px; border-radius: 999px; background: #1d1d1d; z-index: 2; }
+  .screen { height: 100%; border-radius: 34px; overflow: hidden; background: var(--card); display: flex; flex-direction: column; }
+  .screen-head { padding: 48px 16px 10px; display: flex; align-items: center; gap: 8px; font-size: .82rem; font-weight: 500; }
+  .screen-head .avatar { width: 22px; height: 22px; }
+  .screen-img { flex: 1; margin: 0 10px; border-radius: 20px; overflow: hidden; background: #fff; }
+  .screen-img img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 25%; transition: opacity .35s; }
+  .screen-foot { padding: 10px; display: flex; gap: 8px; align-items: center; }
+  .screen-foot span { flex: 1; height: 34px; border-radius: 999px; background: #fff; display: flex; align-items: center; padding: 0 14px; font-size: .78rem; color: var(--gray-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .screen-foot i { width: 34px; height: 34px; border-radius: 50%; background: #fff; display: block; flex-shrink: 0; }
+
+  /* ---------- 와이드 미디어 ---------- */
+  .wide { border-radius: var(--r-xl); overflow: hidden; background: var(--card); }
+  .wide img { width: 100%; height: auto; }
+
+  /* ---------- 소개 ---------- */
+  .about { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .about .card { padding-bottom: 30px; }
+  .about .big { font-size: 1.35rem; line-height: 1.5; color: var(--ink); letter-spacing: -.01em; }
+  .about p[lang="ko"] { word-break: keep-all; line-height: 1.85; }
+  .seg { align-self: flex-start; display: inline-flex; background: #fff; border-radius: 999px; padding: 3px; margin-bottom: 18px; border: 1px solid var(--line); }
+  .seg button { height: 28px; padding: 0 12px; border-radius: 999px; font-size: .8rem; color: var(--gray); }
+  .seg button.on { background: var(--ink); color: #fff; }
+  .tools { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+  .tools span { height: 32px; display: inline-flex; align-items: center; padding: 0 13px; border-radius: 999px; background: #fff; border: 1px solid var(--line); font-size: .86rem; }
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border-radius: 14px; overflow: hidden; margin-top: 22px; }
+  .stats div { background: #fff; padding: 16px; }
+  .stats b { display: block; font-size: 1.6rem; font-weight: 500; letter-spacing: -.02em; }
+  .stats span { font-size: .8rem; color: var(--gray); }
+
+  /* ---------- CTA / 푸터 ---------- */
+  .cta { text-align: center; padding-block: 130px 120px; }
+  .cta h2 { font-size: clamp(2rem, 4.4vw, 3.3rem); margin-bottom: 14px; }
+  .cta p { color: var(--gray); margin-bottom: 28px; }
+  footer { border-top: 1px solid var(--line); padding: 40px 0 56px; font-size: .86rem; color: var(--gray); }
+  footer .wrap { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 24px; }
+  footer a:hover { color: var(--ink); }
+  footer .col { display: grid; gap: 8px; align-content: start; }
+  footer .col b { color: var(--ink); font-weight: 500; }
+
+  /* ---------- 상세 시트 ---------- */
+  .sheet { position: fixed; inset: 0; z-index: 100; background: rgba(15,15,15,.32); display: flex; justify-content: center; align-items: flex-end; opacity: 0; visibility: hidden; transition: opacity .25s; }
+  .sheet.on { opacity: 1; visibility: visible; }
+  .sheet-panel { width: min(1080px, 100%); height: 92vh; background: #fff; border-radius: 24px 24px 0 0; overflow-y: auto; transform: translateY(40px); transition: transform .35s cubic-bezier(.2,.7,.2,1); }
+  .sheet.on .sheet-panel { transform: none; }
+  .sheet-head { position: sticky; top: 0; background: rgba(255,255,255,.92); backdrop-filter: blur(10px); display: flex; align-items: center; gap: 12px; padding: 16px 24px; border-bottom: 1px solid var(--line); z-index: 2; }
+  .sheet-head h3 { font-size: 1.1rem; }
+  .sheet-head span { color: var(--gray); font-size: .86rem; }
+  .sheet-head button { margin-left: auto; width: 34px; height: 34px; border-radius: 50%; background: var(--card-2); font-size: 1rem; }
+  .sheet-body { padding: 24px; display: grid; gap: 16px; }
+  .sheet-body img { width: 100%; border-radius: 16px; background: var(--card); cursor: zoom-in; }
+  .yt { position: relative; aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden; background: #000; }
+  .yt iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .zoom { position: fixed; inset: 0; z-index: 200; background: rgba(255,255,255,.96); display: grid; place-items: center; padding: 20px; opacity: 0; visibility: hidden; transition: opacity .2s; cursor: zoom-out; }
+  .zoom.on { opacity: 1; visibility: visible; }
+  .zoom img { max-width: 96vw; max-height: 92vh; object-fit: contain; border-radius: 12px; }
+  .toast { position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 16px); background: var(--ink); color: #fff; padding: 11px 18px; border-radius: 999px; font-size: .88rem; opacity: 0; transition: .25s; z-index: 300; pointer-events: none; }
+  .toast.on { opacity: 1; transform: translate(-50%, 0); }
+
+  .fade { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
+  .fade.in { opacity: 1; transform: none; }
+
+  @media (max-width: 900px) {
+    .nav-links { display: none; }
+    .app { grid-template-columns: 1fr; height: auto; }
+    .side { border-right: 0; border-bottom: 1px solid var(--line); }
+    .threads { display: flex; overflow-x: auto; padding: 0 8px 10px; gap: 4px; }
+    .thread { grid-template-columns: 34px auto; width: auto; flex-shrink: 0; }
+    .thread time, .me, .search { display: none; }
+    .convo { max-height: 520px; }
+    .feature { grid-template-columns: 1fr; }
+    .feature-art { min-height: 320px; }
+    .feature-art .circle { right: 50%; transform: translate(50%, -50%); width: 300px; }
+    .feature-text { padding: 40px 28px 0; }
+    .pick { grid-template-columns: 1fr; gap: 40px; }
+    .about { grid-template-columns: 1fr; }
+    footer .wrap { grid-template-columns: 1fr 1fr; }
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 520px) {
+    .nav-cta .btn-soft { display: none; }
+    .block { padding-top: 80px; }
+    .card { padding: 24px 22px 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fade { opacity: 1; transform: none; transition: none; }
+    .bubble.status i { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a href="#top" class="brand"><img src="favicon.png" alt="">SENN</a>
+    <nav class="nav-links">
+      <a href="#works">Works</a><a href="#pipeline">Pipeline</a><a href="#motorsports">Motor Sports</a><a href="#about">About</a>
+    </nav>
+    <div class="nav-cta">
+      <button class="btn btn-soft" data-copy-email>Contact</button>
+      <a class="btn btn-dark" href="https://www.artstation.com/sennxe" target="_blank" rel="noopener">ArtStation</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <!-- 히어로 + 앱 창 -->
+  <section class="hero wrap">
+    <a class="pill" href="#" data-open="05_Post Dochi (Vtuber)">New · Post Dochi VTuber model <span class="arrow">↗</span></a>
+    <h1>Meet <img src="favicon.png" alt=""> SENN</h1>
+    <p>A 3D artist who builds characters and machines — modeled, textured and running in real time.</p>
+    <div class="actions">
+      <a class="btn btn-dark btn-lg" href="#works">View works</a>
+      <button class="btn btn-soft btn-lg" data-copy-email>Get in touch</button>
+    </div>
+
+    <div class="app fade" id="works">
+      <aside class="side">
+        <div class="side-top"><span class="dots"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></span><span style="color:var(--gray-2);font-size:1.1rem">+</span></div>
+        <label class="search">⌕ <input id="search" placeholder="Search projects" aria-label="Search projects"></label>
+        <div class="threads" id="threads"></div>
+        <div class="me"><i>CK</i>Kim Chae-yeon</div>
+      </aside>
+      <div class="main">
+        <div class="main-head"><img class="avatar" id="headAvatar" alt=""><span id="headTitle"></span><a href="#" id="openFull">Open project ↗</a></div>
+        <div class="convo" id="convo"></div>
+        <form class="composer" id="composer">
+          <span class="plus">+</span>
+          <input id="ask" placeholder="Message SENN" aria-label="Message SENN">
+          <button class="send" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M12 4l7 7-1.4 1.4L13 7.8V20h-2V7.8l-4.6 4.6L5 11z"/></svg></button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- 특징 카드 -->
+  <section class="block wrap">
+    <div class="feature fade">
+      <div class="feature-text">
+        <h2>Characters you can walk around</h2>
+        <p>From a single fan-art sketch to a rigged, textured model that moves in Unity. Stylized or photoreal, every piece is built to be looked at from every angle.</p>
+      </div>
+      <div class="feature-art"><div class="circle"><img src="" id="circleImg" alt="Wriothesley close-up"></div></div>
+    </div>
+  </section>
+
+  <!-- 파이프라인 -->
+  <section class="block wrap" id="pipeline">
+    <div class="center-head fade">
+      <h2>One artist, every stage</h2>
+      <p>Modeling, texturing and real-time setup handled end to end — so the character you sign off on is the one that ships.</p>
+    </div>
+    <div class="grid-2" id="pipeGrid"></div>
+  </section>
+
+  <!-- 칩 -->
+  <section class="block wrap">
+    <div class="pick">
+      <div class="fade">
+        <h2>Pick a project</h2>
+        <div class="chips" id="chips"></div>
+        <p class="pick-desc" id="pickDesc"></p>
+      </div>
+      <div class="phone fade" aria-hidden="true">
+        <div class="screen">
+          <div class="screen-head"><img class="avatar" id="phoneAvatar" alt=""><span id="phoneTitle"></span></div>
+          <div class="screen-img"><img id="phoneImg" alt=""></div>
+          <div class="screen-foot"><i></i><span id="phoneFoot">Message SENN</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 모터스포츠 -->
+  <section class="block wrap" id="motorsports">
+    <div class="center-head fade">
+      <h2>Motor sports runs on SENN</h2>
+      <p>McLaren F1 wheel cover and Pirelli tyre — a personal study, not affiliated with McLaren or Pirelli.</p>
+    </div>
+    <a href="#" class="wide fade" data-open="01_McLaren F1 Wheel Cover & Pirelli Tyre" style="display:block"><img id="f1Img" alt="McLaren F1 wheel cover and Pirelli tyre"></a>
+  </section>
+
+  <!-- 소개 -->
+  <section class="block wrap" id="about">
+    <div class="about">
+      <div class="card fade">
+        <div class="seg" role="tablist"><button class="on" data-lang="en">EN</button><button data-lang="ko">KR</button></div>
+        <p class="big" lang="en" data-lang-block="en">Born in South Korea in 2002, Chae-yeon "SENN" Kim showed an aptitude for mechanical engineering early on, then majored in 3D art and languages. Comfortable in both photoreal and stylized work, SENN is most at home building motorsport-driven 3D art — and is now growing into modeling, design and game development.</p>
+        <p class="big" lang="ko" data-lang-block="ko" hidden>2002년 대한민국에서 태어났습니다. 어린 시절엔 기계공학에 적성을 보였고, 대학에서 3D와 언어를 전공했습니다. 실사와 캐주얼 스타일을 모두 다루며, 특히 모터스포츠를 중심으로 한 3D 아트워크에 열정을 쏟고 있습니다. 지금은 3D 모델링, 디자인, 게임 개발로 포트폴리오를 넓혀 가고 있습니다.</p>
+      </div>
+      <div class="card fade">
+        <h3>Toolbox</h3>
+        <p>What the work is built with.</p>
+        <div class="tools" id="tools"></div>
+        <div class="stats" id="stats"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta wrap">
+    <h2 class="fade">Got a character in mind?</h2>
+    <p class="fade">Commissions, collaborations or just a hello.</p>
+    <div class="fade" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-dark btn-lg" data-copy-email>Copy email</button>
+      <a class="btn btn-soft btn-lg" href="https://www.youtube.com/playlist?list=PLcl_lgdUTOv4" target="_blank" rel="noopener">Watch on YouTube</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="col"><b>SENN</b><span>Kim Chae-yeon · 3D Artist · South Korea</span></div>
+    <div class="col"><a href="#works">Works</a><a href="#pipeline">Pipeline</a><a href="#about">About</a></div>
+    <div class="col"><a href="https://www.artstation.com/sennxe" target="_blank" rel="noopener">ArtStation</a><a href="https://www.youtube.com/playlist?list=PLcl_lgdUTOv4" target="_blank" rel="noopener">YouTube</a><a href="#" data-copy-email>sennxe@gmail.com</a></div>
+  </div>
+</footer>
+
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="sheet-panel">
+    <div class="sheet-head"><img class="avatar" id="sheetAvatar" alt="" style="width:28px;height:28px"><h3 id="sheetTitle"></h3><span id="sheetSub"></span><button id="sheetClose" aria-label="Close">✕</button></div>
+    <div class="sheet-body" id="sheetBody"></div>
+  </div>
+</div>
+<div class="zoom" id="zoom"><img id="zoomImg" alt=""></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const BASE = '';
+const EMAIL = 'sennxe@gmail.com';
+// 작품 보드에 적힌 정보(제작 기간·면 수·툴)
+const INFO = {
+  '01_Junko':               { kind: 'Fan art', days: '7 days',  faces: '12,620', tris: '',       tools: '3ds Max · Substance Painter · Photoshop · Unity', full: 'Akashi Junko' },
+  '02_Sorai Saki':          { kind: 'Fan art', days: '2 weeks', faces: '12,072', tris: '23,361', tools: 'Maya · Substance Painter · Photoshop · Unity' },
+  '03_Dahlia':              { kind: 'Fan art', days: '12 days', faces: '14,223', tris: '26,426', tools: 'Maya · Substance Painter · Photoshop · Unity' },
+  '04_Wriothesley':         { kind: 'Fan art', days: '3 weeks', faces: '19,393', tris: '35,108', tools: 'Maya · Substance Painter · Photoshop · Unity' },
+  '05_Post Dochi (Vtuber)': { kind: 'VTuber model', tools: 'Maya · Substance Painter · Photoshop · Unity' },
+  '06_AI+Unity':            { kind: 'Tool', tools: 'Gemini · Unity', note: 'A PBR map generator built inside Unity with Gemini.' },
+  '07_AI+GitHub':           { kind: 'Website', tools: 'Gemini · GitHub', note: 'This portfolio site, built and automated with AI.' },
+  '01_McLaren F1 Wheel Cover & Pirelli Tyre': { kind: 'Motor sports', tools: '' }
+};
+const TOOLS = ['Maya', '3ds Max', 'ZBrush', 'Substance Painter', 'Unity', 'Unreal Engine', 'Adobe CC', 'AutoCAD', 'Figma'];
+
+const works = typeof portfolioData !== 'undefined' ? portfolioData : {};
+const motors = typeof motorSportsData !== 'undefined' ? motorSportsData : {};
+const all = { ...works, ...motors };
+const keys = Object.keys(all);
+const enc = p => encodeURI(BASE + p).replace(/#/g, '%23');
+const img = (d, i) => enc((d.thumbs && d.thumbs[i]) || d.images[i]);
+const cover = d => img(d, d.cover || 0);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const nice = t => String(t).replace(/\s*\(.*\)\s*$/, '');
+const info = k => INFO[k] || { kind: motors[k] ? 'Motor sports' : 'Project', tools: '' };
+const ytId = u => { const m = (u || '').match(/(?:youtu\.be\/|v=|embed\/)([\w-]{11})/); return m ? m[1] : null; };
+const DEAD_VIDEOS = ['lZg_M6k3op8', 'wAIwBMrVG5Y']; // 비공개·삭제된 영상
+const line = k => { const i = info(k); return [i.kind, i.days, i.faces && `${i.faces} faces`].filter(Boolean).join(' · '); };
+
+// ---------- 앱 창 ----------
+let current = keys[0];
+function renderThreads(filter = '') {
+  const f = filter.trim().toLowerCase();
+  document.getElementById('threads').innerHTML = keys.filter(k => !f || all[k].title.toLowerCase().includes(f) || (info(k).kind || '').toLowerCase().includes(f)).map(k => `
+    <button class="thread${k === current ? ' on' : ''}" data-key="${esc(k)}">
+      <img class="avatar" src="${cover(all[k])}" alt="" loading="lazy">
+      <span style="min-width:0"><b>${esc(nice(all[k].title))}</b><span>${esc(line(k))}</span></span>
+      <time>${all[k].images.length} img</time>
+    </button>`).join('') || '<p style="padding:12px;color:var(--gray-2);font-size:.85rem">No match</p>';
+}
+function select(k) {
+  current = k;
+  const d = all[k], i = info(k);
+  document.querySelectorAll('.thread').forEach(t => t.classList.toggle('on', t.dataset.key === k));
+  document.getElementById('headAvatar').src = cover(d);
+  document.getElementById('headTitle').textContent = nice(d.title);
+  document.getElementById('ask').placeholder = `Message SENN about ${nice(d.title)}`;
+  const facts = [i.days && `Built in ${i.days}`, i.faces && `${i.faces} faces`, i.tris && `${i.tris} tris`].filter(Boolean).join(', ');
+  document.getElementById('convo').innerHTML = `
+    <div class="shot" data-zoom="${enc(d.images[d.cover || 0])}"><img src="${cover(d)}" alt="${esc(d.title)}" onload="if(this.naturalHeight>this.naturalWidth)this.parentNode.classList.add('portrait')"></div>
+    <div class="bubble mine">Show me ${esc(nice(i.full || d.title))}</div>
+    <div class="bubble">${esc(i.note || `${i.kind}${facts ? '. ' + facts + '.' : '.'}`)}</div>
+    ${i.tools ? `<div class="bubble">Made with ${esc(i.tools)}.</div>` : ''}
+    <span class="bubble status"><i></i>${d.images.length} images ready${ytId(d.youtube) && !DEAD_VIDEOS.includes(ytId(d.youtube)) ? ' · video' : ''}</span>`;
+}
+document.getElementById('threads').addEventListener('click', e => { const t = e.target.closest('.thread'); if (t) select(t.dataset.key); });
+document.getElementById('search').addEventListener('input', e => renderThreads(e.target.value));
+document.getElementById('openFull').addEventListener('click', e => { e.preventDefault(); openSheet(current); });
+document.getElementById('composer').addEventListener('submit', e => {
+  e.preventDefault();
+  const q = document.getElementById('ask').value.trim();
+  if (!q) return;
+  document.getElementById('convo').insertAdjacentHTML('beforeend', `<div class="bubble mine">${esc(q)}</div><div class="bubble">Thanks! Email ${EMAIL} and SENN will get back to you — the address is copied.</div>`);
+  document.getElementById('ask').value = '';
+  copyEmail(true);
+  const c = document.getElementById('convo'); c.scrollTop = c.scrollHeight;
+});
+
+// ---------- 파이프라인 카드 ----------
+const PIPE = [
+  ['Modeling', 'Clean topology, from turnaround to wireframe.', '01_Junko', 3, 'Maya · 3ds Max'],
+  ['Texturing', 'Hand-painted and baked maps in Substance Painter.', '02_Sorai Saki', 5, 'Substance'],
+  ['Real-time setup', 'Shaders, blendshapes and spring bones in Unity.', '05_Post Dochi (Vtuber)', 4, 'Unity'],
+  ['Tools that save time', 'An AI-assisted PBR map generator inside Unity.', '06_AI+Unity', 0, 'Gemini']
+];
+document.getElementById('pipeGrid').innerHTML = PIPE.filter(p => all[p[2]]).map(([h, p, k, i, tag]) => {
+  const d = all[k]; const idx = Math.min(i, d.images.length - 1);
+  return `<a href="#" class="card fade" data-open="${esc(k)}"><h3>${h}</h3><p>${p}</p>
+    <div class="frame"><div class="frame-bar"><i></i><i></i><i></i>${esc(nice(d.title))}<span class="tag">${tag}</span></div><img src="${img(d, idx)}" alt="${esc(h)} — ${esc(d.title)}" loading="lazy"></div></a>`;
+}).join('');
+
+// ---------- 칩 + 폰 ----------
+function pick(k) {
+  const d = all[k], i = info(k);
+  document.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c.dataset.key === k));
+  const p = document.getElementById('phoneImg'); p.style.opacity = 0;
+  setTimeout(() => { p.src = cover(d); p.onload = () => p.style.opacity = 1; }, 150);
+  document.getElementById('phoneAvatar').src = cover(d);
+  document.getElementById('phoneTitle').textContent = nice(d.title);
+  document.getElementById('phoneFoot').textContent = `Message SENN about ${nice(d.title)}`;
+  document.getElementById('pickDesc').innerHTML = `<b>${esc(nice(i.full || d.title))}.</b> ${esc(i.note || [i.kind, i.days && 'built in ' + i.days, i.tris && i.tris + ' tris'].filter(Boolean).join(', ') + '.')}`;
+}
+document.getElementById('chips').innerHTML = keys.map(k => `<button class="chip" data-key="${esc(k)}"><img src="${cover(all[k])}" alt="" loading="lazy">${esc(nice(all[k].title))}</button>`).join('');
+document.getElementById('chips').addEventListener('click', e => { const c = e.target.closest('.chip'); if (c) pick(c.dataset.key); });
+
+// ---------- 상세 시트 ----------
+const sheet = document.getElementById('sheet');
+function openSheet(k) {
+  const d = all[k]; if (!d) return;
+  document.getElementById('sheetAvatar').src = cover(d);
+  document.getElementById('sheetTitle').textContent = nice(info(k).full || d.title);
+  document.getElementById('sheetSub').textContent = line(k);
+  const id = ytId(d.youtube);
+  document.getElementById('sheetBody').innerHTML = (id && !DEAD_VIDEOS.includes(id) ? `<div class="yt"><iframe src="https://www.youtube.com/embed/${id}" allowfullscreen title="${esc(d.title)}"></iframe></div>` : '')
+    + d.images.map((s, i) => `<img src="${img(d, i)}" data-zoom="${enc(s)}" alt="${esc(d.title)} ${i + 1}" loading="lazy">`).join('');
+  sheet.classList.add('on'); document.body.style.overflow = 'hidden';
+  document.getElementById('sheetClose').focus();
+}
+function closeSheet() { sheet.classList.remove('on'); document.body.style.overflow = ''; setTimeout(() => document.getElementById('sheetBody').innerHTML = '', 300); }
+sheet.addEventListener('click', e => { if (e.target === sheet || e.target.id === 'sheetClose') closeSheet(); });
+const zoom = document.getElementById('zoom');
+zoom.addEventListener('click', () => zoom.classList.remove('on'));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (zoom.classList.contains('on')) zoom.classList.remove('on'); else closeSheet(); } });
+
+// ---------- 공통 클릭 ----------
+function toast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 2200); }
+function copyEmail(silent) {
+  const ok = () => !silent && toast(`Copied ${EMAIL}`);
+  navigator.clipboard ? navigator.clipboard.writeText(EMAIL).then(ok, () => toast(EMAIL)) : toast(EMAIL);
+}
+document.addEventListener('click', e => {
+  const c = e.target.closest('[data-copy-email]'); if (c) { e.preventDefault(); copyEmail(); return; }
+  const o = e.target.closest('[data-open]'); if (o) { e.preventDefault(); openSheet(o.dataset.open); return; }
+  const z = e.target.closest('[data-zoom]'); if (z) { document.getElementById('zoomImg').src = z.dataset.zoom; zoom.classList.add('on'); }
+});
+document.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('[data-lang]').forEach(x => x.classList.toggle('on', x === b));
+  document.querySelectorAll('[data-lang-block]').forEach(p => p.hidden = p.dataset.langBlock !== b.dataset.lang);
+}));
+
+// ---------- 소개 카드 ----------
+document.getElementById('tools').innerHTML = TOOLS.map(t => `<span>${esc(t)}</span>`).join('');
+const totalImgs = keys.reduce((n, k) => n + all[k].images.length, 0);
+document.getElementById('stats').innerHTML = [[Object.keys(works).length, 'Projects'], [totalImgs, 'Images'], ['35,108', 'Tris on the densest model'], ['7 days', 'Fastest character']]
+  .map(([b, s]) => `<div><b>${b}</b><span>${s}</span></div>`).join('');
+
+// ---------- 이미지 채우기 ----------
+if (all['04_Wriothesley']) document.getElementById('circleImg').src = img(all['04_Wriothesley'], Math.min(2, all['04_Wriothesley'].images.length - 1));
+const f1 = Object.keys(motors)[0]; if (f1) document.getElementById('f1Img').src = cover(motors[f1]);
+
+renderThreads(); select(current); pick(keys[0]);
+const io = new IntersectionObserver(es => es.forEach(x => { if (x.isIntersecting) { x.target.classList.add('in'); io.unobserve(x.target); } }), { threshold: .08 });
+document.querySelectorAll('.fade').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
